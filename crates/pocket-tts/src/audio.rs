@@ -176,7 +176,7 @@ pub fn write_wav_to_writer<W: std::io::Write + std::io::Seek>(
 
     let mut wav_writer = WavWriter::new(writer, spec)?;
     let pcm_bytes = pcm_i16_le_bytes(audio)?;
-    for chunk in pcm_bytes.chunks_exact(2) {
+    for chunk in pcm_bytes.as_chunks::<2>().0 {
         let sample = i16::from_le_bytes([chunk[0], chunk[1]]);
         wav_writer.write_sample(sample)?;
     }
@@ -282,7 +282,9 @@ mod tests {
 
         let bytes = pcm_i16_le_bytes(&t)?;
         let samples: Vec<i16> = bytes
-            .chunks_exact(2)
+            .as_chunks::<2>()
+            .0
+            .iter()
             .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]))
             .collect();
 
