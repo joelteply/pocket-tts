@@ -7,7 +7,7 @@ RUN bun run build
 
 # Stage 2: Build Rust
 # Multi-stage build for pocket-tts with pre-downloaded models
-FROM rust:1.92-bullseye AS builder
+FROM rust:1.92-bookworm AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -29,12 +29,12 @@ RUN cargo build --release
 # =============================================================================
 # Runtime with manual downloads
 # =============================================================================
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libssl1.1 \
+    libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /build/target/release/pocket-tts-cli /usr/local/bin/pocket-tts
